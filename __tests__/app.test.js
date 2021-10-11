@@ -28,32 +28,77 @@ describe('app routes', () => {
       return client.end(done);
     });
 
-    test('returns animals', async() => {
+    test('returns todos', async() => {
 
       const expectation = [
         {
-          'id': 1,
-          'name': 'bessie',
-          'cool_factor': 3,
-          'owner_id': 1
-        },
-        {
-          'id': 2,
-          'name': 'jumpy',
-          'cool_factor': 4,
-          'owner_id': 1
-        },
-        {
-          'id': 3,
-          'name': 'spot',
-          'cool_factor': 10,
-          'owner_id': 1
+          'id': expect.any(Number),
+          'job': expect.any(String),
+          'status': false,
+          'due': expect.any(String),
+          'owner_id': expect.any(Number)
         }
       ];
 
       const data = await fakeRequest(app)
-        .get('/animals')
+        .post('/api/todoLists')
+        .send(
+          {
+            'id': expect.any(Number),
+            'job': expect.any(String),
+            'status': false,
+            'due': expect.any(String),
+            'owner_id': expect.any(Number)
+          }
+        )
         .expect('Content-Type', /json/)
+        .set('Authorization', token)
+        .expect(200);
+
+      expect(data.body).toEqual(expectation);
+    });
+
+    test('get todos', async() => {
+
+      const expectation = [
+        {
+          'id': expect.any(Number),
+          'job': expect.any(String),
+          'status': false,
+          'due': expect.any(String),
+          'owner_id': expect.any(Number)
+        }
+      ];
+
+      const data = await fakeRequest(app)
+        .get('/api/todoLists/')
+        .expect('Content-Type', /json/)
+        .set('Authorization', token)
+        .expect(200);
+
+      expect(data.body).toEqual(expectation);
+    });
+
+    test('update todos', async() => {
+
+      const expectation = [{
+        'id': expect.any(Number),
+        'job': expect.any(String),
+        'status': true,
+        'due': expect.any(String),
+        'owner_id': expect.any(Number)
+      }];
+
+      const data = await fakeRequest(app)
+        .put('/api/todoLists/2')
+        .send({
+          job: expect.any(String),
+          status: true,
+          due: expect.any(String)
+        }
+        )
+        .expect('Content-Type', /json/)
+        .set('Authorization', token)
         .expect(200);
 
       expect(data.body).toEqual(expectation);
